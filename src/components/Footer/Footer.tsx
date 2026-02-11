@@ -6,12 +6,14 @@ interface Props {
   activeCount: number;
   completedCount: number;
   filter: FilterType;
+  onClearCompleted: () => void;
 }
 
 export const Footer: React.FC<Props> = ({
   activeCount,
   filter,
   completedCount,
+  onClearCompleted,
 }) => {
   return (
     <footer className="todoapp__footer" data-cy="Footer">
@@ -26,6 +28,7 @@ export const Footer: React.FC<Props> = ({
         className="todoapp__clear-completed"
         data-cy="ClearCompletedButton"
         disabled={completedCount === 0}
+        onClick={onClearCompleted}
       >
         Clear completed
       </button>

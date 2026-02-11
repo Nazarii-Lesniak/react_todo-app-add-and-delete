@@ -5,9 +5,10 @@ import classNames from 'classnames';
 interface Props {
   todo: Todo;
   isLoading: boolean;
+  onDelete: (id: number) => void;
 }
 
-export const TodoItem: React.FC<Props> = ({ todo, isLoading }) => {
+export const TodoItem: React.FC<Props> = ({ todo, isLoading, onDelete }) => {
   return (
     <div
       data-cy="Todo"
@@ -27,7 +28,12 @@ export const TodoItem: React.FC<Props> = ({ todo, isLoading }) => {
         {todo.title}
       </span>
 
-      <button type="button" className="todo__remove" data-cy="TodoDelete">
+      <button
+        type="button"
+        className="todo__remove"
+        data-cy="TodoDelete"
+        onClick={() => onDelete(todo.id)}
+      >
         ×
       </button>
 

@@ -1,11 +1,45 @@
 import classNames from 'classnames';
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { ERRORS } from '../../types/Todo';
 
 interface Props {
   allCompleted: boolean;
+  loading: boolean;
+  addTodo: (title: string) => Promise<void>;
+  onError: (error: string) => void;
 }
 
-export const Header: React.FC<Props> = ({ allCompleted }) => {
+export const Header: React.FC<Props> = ({
+  allCompleted,
+  loading,
+  addTodo,
+  onError,
+}) => {
+  const [title, setTitle] = useState('');
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const handleSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
+
+    const normalizedTitle = title.trim();
+
+    if (normalizedTitle.length === 0) {
+      onError(ERRORS.EMPTY_TITLE);
+
+      return;
+    }
+
+    addTodo(normalizedTitle.trim())
+      .then(() => setTitle(''))
+      .catch(() => {});
+  };
+
+  useEffect(() => {
+    if (!loading) {
+      inputRef.current?.focus();
+    }
+  }, [loading]);
+
   return (
     <header className="todoapp__header">
       <button
@@ -14,13 +48,17 @@ export const Header: React.FC<Props> = ({ allCompleted }) => {
         data-cy="ToggleAllButton"
       />
 
-      <form>
+      <form onSubmit={handleSubmit}>
         <input
           data-cy="NewTodoField"
           type="text"
           className="todoapp__new-todo"
           placeholder="What needs to be done?"
-          onSubmit={event => event.preventDefault()}
+          value={title}
+          onChange={event => setTitle(event.target.value)}
+          disabled={loading}
+          autoFocus
+          ref={inputRef}
         />
       </form>
     </header>
