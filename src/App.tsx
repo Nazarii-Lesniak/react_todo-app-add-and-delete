@@ -139,6 +139,7 @@ export const App: React.FC = () => {
           loading={tempTodo !== null}
           onError={setErrorMessage}
           inputRef={todoInputRef}
+          hasTodos={todos.length > 0}
         />
         {todos.length > 0 && (
           <TodoList

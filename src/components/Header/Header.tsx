@@ -8,6 +8,7 @@ interface Props {
   addTodo: (title: string) => Promise<void>;
   onError: (error: string) => void;
   inputRef: React.RefObject<HTMLInputElement>;
+  hasTodos: boolean;
 }
 
 export const Header: React.FC<Props> = ({
@@ -16,6 +17,7 @@ export const Header: React.FC<Props> = ({
   addTodo,
   onError,
   inputRef,
+  hasTodos,
 }) => {
   const [title, setTitle] = useState('');
 
@@ -43,11 +45,15 @@ export const Header: React.FC<Props> = ({
 
   return (
     <header className="todoapp__header">
-      <button
-        type="button"
-        className={classNames('todoapp__toggle-all', { active: allCompleted })}
-        data-cy="ToggleAllButton"
-      />
+      {hasTodos && (
+        <button
+          type="button"
+          className={classNames('todoapp__toggle-all', {
+            active: allCompleted,
+          })}
+          data-cy="ToggleAllButton"
+        />
+      )}
 
       <form onSubmit={handleSubmit}>
         <input
