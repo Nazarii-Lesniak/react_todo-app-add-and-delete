@@ -1,5 +1,5 @@
 import classNames from 'classnames';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ERRORS } from '../../types/Todo';
 
 interface Props {
@@ -7,6 +7,7 @@ interface Props {
   loading: boolean;
   addTodo: (title: string) => Promise<void>;
   onError: (error: string) => void;
+  inputRef: React.RefObject<HTMLInputElement>;
 }
 
 export const Header: React.FC<Props> = ({
@@ -14,9 +15,9 @@ export const Header: React.FC<Props> = ({
   loading,
   addTodo,
   onError,
+  inputRef,
 }) => {
   const [title, setTitle] = useState('');
-  const inputRef = useRef<HTMLInputElement>(null);
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
@@ -38,7 +39,7 @@ export const Header: React.FC<Props> = ({
     if (!loading) {
       inputRef.current?.focus();
     }
-  }, [loading]);
+  }, [loading, inputRef]);
 
   return (
     <header className="todoapp__header">

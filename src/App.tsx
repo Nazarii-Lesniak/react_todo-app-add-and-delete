@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { UserWarning } from './UserWarning';
 import { createTodo, deleteTodo, getTodos, USER_ID } from './api/todos';
 import { ERRORS, Todo, FilterType } from './types/Todo';
@@ -17,6 +17,7 @@ export const App: React.FC = () => {
   const activeCount = todos.filter(todo => !todo.completed).length;
   const completedCount = todos.length - activeCount;
   const isAllCompleted = todos.length > 0 && activeCount === 0;
+  const todoInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     getTodos()
@@ -88,6 +89,7 @@ export const App: React.FC = () => {
         setTodos(currentTodos =>
           currentTodos.filter(todo => todo.id !== todoId),
         );
+        todoInputRef.current?.focus();
       })
       .catch(() => {
         setErrorMessage(ERRORS.DELETE);
@@ -103,19 +105,23 @@ export const App: React.FC = () => {
 
     setLoadingTodoIds(currentIds => [...currentIds, ...idsToDelete]);
 
-    completedTodos.forEach(todo => {
-      deleteTodo(todo.id)
-        .then(() => {
-          setTodos(currentTodos =>
-            currentTodos.filter(currentTodo => currentTodo.id !== todo.id),
-          );
-        })
-        .catch(() => setErrorMessage(ERRORS.DELETE))
-        .finally(() => {
-          setLoadingTodoIds(currentIds =>
-            currentIds.filter(id => id !== todo.id),
-          );
-        });
+    Promise.all(
+      completedTodos.map(todo => {
+        return deleteTodo(todo.id)
+          .then(() => {
+            setTodos(currentTodos =>
+              currentTodos.filter(currentTodo => currentTodo.id !== todo.id),
+            );
+          })
+          .catch(() => setErrorMessage(ERRORS.DELETE))
+          .finally(() => {
+            setLoadingTodoIds(currentIds =>
+              currentIds.filter(id => id !== todo.id),
+            );
+          });
+      }),
+    ).then(() => {
+      todoInputRef.current?.focus();
     });
   };
 
@@ -132,6 +138,7 @@ export const App: React.FC = () => {
           addTodo={handleAddTodo}
           loading={tempTodo !== null}
           onError={setErrorMessage}
+          inputRef={todoInputRef}
         />
         {todos.length > 0 && (
           <TodoList
